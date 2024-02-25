@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
     private bool isDashing = false;
     private float dashSpeed = 200f;
     private float dashTime = 0.1f;
-    private float dashCooldown = 1f;
+    private float dashCooldown = 3f;
 
     // Movement Fields
     private float horizontal;
@@ -24,6 +24,7 @@ public class Player : MonoBehaviour
     private float jumpingPower = 12f;
     private bool isFacingRight = true;
     private int numberOfJumps = 2;
+    private float jumpCooldown = 0.5f;
 
     void Update()
     {
@@ -40,6 +41,12 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+
+        // dashing
+        if (isDashing)
+        {
+            rb.velocity = new Vector2(transform.localScale.x * dashSpeed, 0f);
+        }
     }
 
     public void Jump(InputAction.CallbackContext context)
@@ -62,6 +69,8 @@ public class Player : MonoBehaviour
 
         if (IsGrounded())
         {
+            // wait for a short time before allowing the player to jump again
+
             numberOfJumps = 1;
         }
     }
@@ -98,14 +107,13 @@ public class Player : MonoBehaviour
         * Coroutine to perform the dash
         The actual code for the dash is in this coroutine
         */
-        
     private IEnumerator PerformDash()
     {
         canDash = false;
         isDashing = true;
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
-        rb.velocity = new Vector2(transform.localScale.x * dashSpeed, 0f);
+        //rb.velocity = new Vector2(transform.localScale.x * dashSpeed, 0f);
         dashTrail.emitting = true;
         yield return new WaitForSeconds(dashTime);
         dashTrail.emitting = false;
